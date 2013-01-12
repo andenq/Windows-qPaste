@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -36,9 +37,8 @@ namespace Windows_qPaste
                 string link = json.link;
                 string token = json.token;
 
-                ExecuteSecure(() => {  
-                    Clipboard.SetText(link + " ");
-                    InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+                ExecuteSecure(() => {
+                    Paste(link);
                 });
 
                 var yourUrl = "http://localhost:1337/upload";
@@ -57,10 +57,57 @@ namespace Windows_qPaste
             })).Start();
         }
 
+        /// <summary>
+        /// Closes and disposes of this window.
+        /// </summary>
         public void Done()
         {
             Close();
             Dispose();
+        }
+
+        /// <summary>
+        /// Populates the clipboard with appropiate link, pastes it, and then repopulates it with the original data.
+        /// </summary>
+        /// <param name="link">Link to paste.</param>
+        public void Paste(string link)
+        {
+            string type = "";
+
+            StringCollection files = null;
+            Image image = null;
+            string text = null;
+            if (Clipboard.ContainsFileDropList())
+            {
+                type = "files";
+                files = Clipboard.GetFileDropList();
+            }
+            else if (Clipboard.ContainsImage())
+            {
+                type = "image";
+                image = Clipboard.GetImage();
+            }
+            else if (Clipboard.ContainsText())
+            {
+                type = "text";
+                text = Clipboard.GetText();
+            }
+
+            Clipboard.SetText(link + " ");
+            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+
+            switch (type)
+            {
+                case "files":
+                    Clipboard.SetFileDropList(files);
+                    break;
+                case "image":
+                    Clipboard.SetImage(image);
+                    break;
+                case "text":
+                    Clipboard.SetText(text);
+                    break;
+            }
         }
         
         /// <summary>
