@@ -54,7 +54,7 @@ namespace Windows_qPaste
             req.AllowAutoRedirect = false;
 
             var mimeParts = new List<MimePart>();
-            try {
+            //try {
                 if (otherValues != null) {
                     foreach (var fieldName in otherValues.Keys) {
                         var part = new MimePart();
@@ -115,14 +115,14 @@ namespace Windows_qPaste
                 var res = (HttpWebResponse)req.GetResponse();
 
                 return res;
-            } catch (Exception ex) {
+            /*} catch (Exception ex) {
                 Console.WriteLine(ex.Message);
                 foreach (MimePart part in mimeParts)
                     if (part.Data != null)
                         part.Data.Dispose();
 
                 return (HttpWebResponse)req.GetResponse();
-            }
+            }*/
         }
 
         private class MimePart {

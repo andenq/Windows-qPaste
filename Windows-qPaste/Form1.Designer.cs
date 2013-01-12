@@ -89,7 +89,7 @@
             // 
             // BrowseButton
             // 
-            this.BrowseButton.Location = new System.Drawing.Point(646, 106);
+            this.BrowseButton.Location = new System.Drawing.Point(645, 106);
             this.BrowseButton.Name = "BrowseButton";
             this.BrowseButton.Size = new System.Drawing.Size(104, 23);
             this.BrowseButton.TabIndex = 5;

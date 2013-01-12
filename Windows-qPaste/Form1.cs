@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using MouseKeyboardActivityMonitor;
+using MouseKeyboardActivityMonitor.WinApi;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -18,6 +21,8 @@ namespace Windows_qPaste
     public partial class Form1 : Form
     {
         KeyboardHook hook = new KeyboardHook();
+        Queue<string> uploadQueue = new Queue<string>();
+        readonly int simultaneousUploads = 1;
         public Form1()
         {
             InitializeComponent();
@@ -36,14 +41,55 @@ namespace Windows_qPaste
                 StringCollection files = Clipboard.GetFileDropList();
                 foreach (string file in files) 
                 {
-                    DoUpload(file);
+                    FileAttributes attr = File.GetAttributes(file);
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    {
+                        //Directory
+                    }
+                    else
+                    {
+                        uploadQueue.Enqueue(file);
+                    }
                 }
+                DoQueue();
             }
+        }
+
+        private void QueueUpload(string filepath)
+        {
+            uploadQueue.Enqueue(filepath);
         }
 
         private void DoUpload(string filepath)
         {
-            new UploadForm(filepath).Show();
+            new UploadForm(filepath, UploadDone).Show();
+        }
+
+        int activeUploads = 0;
+        private void DoQueue()
+        {
+            if (uploadQueue.Count > 0)
+            {
+                if (activeUploads == 0)
+                {
+                    activeUploads = 1;
+                    DoUpload(uploadQueue.Dequeue());
+                }
+                else
+                {
+                    if (activeUploads < simultaneousUploads)
+                    {
+                        activeUploads++;
+                        DoUpload(uploadQueue.Dequeue());
+                    }
+                }
+            }
+        }
+
+        private void UploadDone()
+        {
+            activeUploads--;
+            DoQueue();
         }
 
         private void BrowseButton_Click(object sender, EventArgs e)

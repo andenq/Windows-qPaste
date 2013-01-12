@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -18,13 +19,18 @@ namespace Windows_qPaste
 {
     public partial class UploadForm : Form
     {
-        public UploadForm(string filepath)
+        Action callback;
+        //readonly string HOST = "http://qpaste.eu01.aws.af.cm";
+        readonly string HOST = "http://127.0.0.1:1337";
+        public UploadForm(string filepath, Action callback)
         {
             InitializeComponent();
+            this.callback = callback;
             new Thread(new ThreadStart(delegate {
-                var request = WebRequest.Create("http://localhost:1337/upload-token");
+                //var request = WebRequest.Create("http://localhost:1337/upload-token");
+                var request = WebRequest.Create(HOST + "/upload-token");
                 string text;
-                ExecuteSecure(() => { StatusLabel.Text = "Getting link..."; });
+                //ExecuteSecure(() => { StatusLabel.Text = "Getting link..."; });
                 var response = (HttpWebResponse)request.GetResponse();
 
                 using (var sr = new StreamReader(response.GetResponseStream()))
@@ -41,7 +47,7 @@ namespace Windows_qPaste
                     Paste(link);
                 });
 
-                var yourUrl = "http://localhost:1337/upload";
+                var yourUrl = HOST + "/upload";
                 var httpForm = new HttpForm(yourUrl);
                 httpForm.AttachFile("upload", filepath);
                 httpForm.SetValue("token", token);
@@ -64,6 +70,7 @@ namespace Windows_qPaste
         {
             Close();
             Dispose();
+            callback();
         }
 
         /// <summary>
@@ -100,6 +107,11 @@ namespace Windows_qPaste
             {
                 case "files":
                     Clipboard.SetFileDropList(files);
+                    Debug.Write("Clipboard contained files: ");
+                    foreach (string file in files) 
+                    {
+                        Debug.Write(file + "\n");
+                    }
                     break;
                 case "image":
                     Clipboard.SetImage(image);

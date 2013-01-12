@@ -35,19 +35,20 @@ namespace Windows_qPaste
             /// <param name="m"></param>
             protected override void WndProc(ref Message m)
             {
-                base.WndProc(ref m);
-
                 // check if we got a hot key pressed.
                 if (m.Msg == WM_HOTKEY)
                 {
                     // get the keys.
                     Keys key = (Keys)(((int)m.LParam >> 16) & 0xFFFF);
                     ModifierKeys modifier = (ModifierKeys)((int)m.LParam & 0xFFFF);
-
                     // invoke the event to notify the parent.
                     if (KeyPressed != null)
                         KeyPressed(this, new KeyPressedEventArgs(modifier, key));
+
+                    return;
                 }
+
+                base.WndProc(ref m);
             }
 
             public event EventHandler<KeyPressedEventArgs> KeyPressed;
