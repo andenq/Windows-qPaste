@@ -80,6 +80,7 @@ namespace Windows_qPaste
                 string toPaste = link + " ";
                 Clipboard.SetText(toPaste);
                 
+                //The clipboard is slow, we have to wait for it!
                 while (!Clipboard.GetText().Equals(toPaste))
                     Thread.Sleep(500);
                 

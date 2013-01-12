@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -31,7 +34,7 @@ namespace Windows_qPaste
         {
             if (isUploading)
                 return;
-            Debug.WriteLine("Handling upload");
+            ToastForm toast = new ToastForm();
             isUploading = true;
             if (Clipboard.ContainsFileDropList())
             {
@@ -45,12 +48,24 @@ namespace Windows_qPaste
             }
             else if (Clipboard.ContainsImage())
             {
-
+                string file = Path.GetTempPath() + "\\qpaste_temp.png";
+                Image image = Clipboard.GetImage();
+                image.Save(file, ImageFormat.Png);
+                Token token = UploadHelper.getToken();
+                ClipboardHelper.Paste(token.link);
+                UploadHelper.Upload(file, token);
+                File.Delete(file);
             }
             else if (Clipboard.ContainsText())
             {
-
+                string file = Path.GetTempPath() + "\\qpaste_temp.txt";
+                File.WriteAllText(file, Clipboard.GetText());
+                Token token = UploadHelper.getToken();
+                ClipboardHelper.Paste(token.link);
+                UploadHelper.Upload(file, token);
+                File.Delete(file);
             }
+            toast.Close();
             isUploading = false;
         }
 
