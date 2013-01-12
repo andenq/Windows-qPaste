@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ionic.Utils.Zip;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -18,13 +19,33 @@ namespace Windows_qPaste
     /// </summary>
     class HotkeyHandler
     {
+        KeyboardHook hook = new KeyboardHook();
+        System.Windows.Forms.Timer hookTimer = new System.Windows.Forms.Timer();
         bool isUploading = false;
         public HotkeyHandler()
         {
             //Hook to global keyboard for qPaste Hotkey
-            KeyboardHook hook = new KeyboardHook();
             hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-            hook.RegisterHotKey(Windows_qPaste.ModifierKeys.Control | Windows_qPaste.ModifierKeys.Shift, Keys.V);
+
+            //Application seems to lose the binding after a while
+            hookTimer.Interval = 1000 * 60;
+            hookTimer.Tick += (object sender, EventArgs e) => { Hook(); };
+            hookTimer.Start();
+
+            Hook();
+        }
+
+        private void Hook()
+        {
+            try
+            {
+                Debug.WriteLine("Binding hotkey");
+                hook.RegisterHotKey(Windows_qPaste.ModifierKeys.Control | Windows_qPaste.ModifierKeys.Shift, Keys.V);
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.WriteLine("Key already bound");
+            }
         }
         
         /// <summary>
@@ -39,11 +60,57 @@ namespace Windows_qPaste
             if (Clipboard.ContainsFileDropList())
             {
                 StringCollection files = Clipboard.GetFileDropList();
-                foreach (string file in files)
+                if (files.Count > 1 && (bool)Properties.Settings.Default["combinezip"])
                 {
                     Token token = UploadHelper.getToken();
                     ClipboardHelper.Paste(token.link);
-                    UploadHelper.Upload(file, token);
+
+                    string tempfile = Path.GetTempPath() + "\\qpaste.zip";
+                    using (ZipFile zip = new ZipFile(tempfile))
+                    {
+                        foreach (string file in files)
+                        {
+                            FileAttributes attr = File.GetAttributes(file);
+                            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                            {
+                                Debug.WriteLine(Path.GetFileName(file));
+                                zip.AddDirectory(file, Path.GetFileName(file));
+                            }
+                            else
+                            {
+                                zip.AddFile(file, "");
+                            }
+                        }
+                        zip.Save();
+                    }
+
+                    UploadHelper.Upload(tempfile, token);
+                    File.Delete(tempfile);
+                }
+                else
+                {
+                    foreach (string file in files)
+                    {
+                        Token token = UploadHelper.getToken();
+                        ClipboardHelper.Paste(token.link);
+
+                        FileAttributes attr = File.GetAttributes(file);
+                        if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            string tempfile = Path.GetTempPath() + "\\"+ Path.GetFileNameWithoutExtension(file) +".zip";
+                            using (ZipFile zip = new ZipFile(tempfile))
+                            {
+                                zip.AddDirectory(file, "");
+                                zip.Save();
+                            }
+                            UploadHelper.Upload(tempfile, token);
+                            File.Delete(tempfile);
+                        }
+                        else
+                        {
+                            UploadHelper.Upload(file, token);
+                        }
+                    }
                 }
             }
             else if (Clipboard.ContainsImage())
