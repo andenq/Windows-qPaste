@@ -19,6 +19,14 @@ namespace Windows_qPaste
             InitializeComponent();
             new HotkeyHandler();
 
+            if (AutostartHelper.isAutostartEnabled())
+            {
+                if (!AutostartHelper.isAutostartPathThis())
+                {
+                    AutostartHelper.SetAutostart();
+                }
+                AutostartCheckbox.Checked = true;
+            }
             CombineZIPCheckbox.Checked = (bool) Properties.Settings.Default["combinezip"];
 
             Debug.WriteLine(Clipboard.ContainsFileDropList().ToString());
@@ -54,7 +62,14 @@ namespace Windows_qPaste
 
         private void AutostartCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default["autostart"] = AutostartCheckbox.Checked;
+            if (AutostartCheckbox.Checked)
+            {
+                AutostartHelper.SetAutostart();
+            }
+            else
+            {
+                AutostartHelper.UnSetAutostart();
+            }
         }
 
         bool firstTimeOpen = true;

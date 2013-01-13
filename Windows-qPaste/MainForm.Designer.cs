@@ -69,7 +69,6 @@
             // AutostartCheckbox
             // 
             this.AutostartCheckbox.AutoSize = true;
-            this.AutostartCheckbox.Enabled = false;
             this.AutostartCheckbox.Location = new System.Drawing.Point(17, 80);
             this.AutostartCheckbox.Name = "AutostartCheckbox";
             this.AutostartCheckbox.Size = new System.Drawing.Size(148, 21);
