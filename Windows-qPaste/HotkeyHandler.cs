@@ -56,7 +56,7 @@ namespace Windows_qPaste
             if (isUploading)
                 return;
             //ToastForm toast = new ToastForm();
-            ToastForm.View();
+            //ToastForm.View();
             isUploading = true;
             if (Clipboard.ContainsFileDropList())
             {
@@ -86,11 +86,15 @@ namespace Windows_qPaste
                         zip.Save();
                     }
 
-                    UploadHelper.UploadAsync(tempfile, token, new Action(() => 
+                    UploadHelper.Upload(tempfile, token);
+                    File.Delete(tempfile);
+                    AfterUpload();
+
+                    /*UploadHelper.UploadAsync(tempfile, token, new Action(() => 
                     {
                         File.Delete(tempfile);
                         AfterUpload();
-                    }));
+                    }));*/
                 }
                 else
                 {
@@ -109,18 +113,26 @@ namespace Windows_qPaste
                                 zip.AddDirectory(file, "");
                                 zip.Save();
                             }
-                            UploadHelper.UploadAsync(tempfile, token, new Action(() =>
+
+                            UploadHelper.Upload(tempfile, token);
+                            File.Delete(tempfile);
+                            AfterUpload();
+
+                            /*UploadHelper.UploadAsync(tempfile, token, new Action(() =>
                             {
                                 File.Delete(tempfile);
                                 AfterUpload();
-                            }));
+                            }));*/
                         }
                         else
                         {
-                            UploadHelper.UploadAsync(file, token, new Action(() =>
+                            UploadHelper.Upload(file, token);
+                            AfterUpload();
+
+                            /*UploadHelper.UploadAsync(file, token, new Action(() =>
                             {
                                 AfterUpload();
-                            }));
+                            }));*/
                         }
                     }
                 }
@@ -133,11 +145,16 @@ namespace Windows_qPaste
                 image.Save(file, ImageFormat.Png);
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
-                UploadHelper.UploadAsync(file, token, new Action(() =>
+
+                UploadHelper.Upload(file, token);
+                File.Delete(file);
+                AfterUpload();
+
+                /*UploadHelper.UploadAsync(file, token, new Action(() =>
                 {
                     File.Delete(file);
                     AfterUpload();
-                }));
+                }));*/
             }
             else if (Clipboard.ContainsText())
             {
@@ -146,11 +163,16 @@ namespace Windows_qPaste
                 File.WriteAllText(file, Clipboard.GetText());
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
-                UploadHelper.UploadAsync(file, token, new Action(() =>
+
+                UploadHelper.Upload(file, token);
+                File.Delete(file);
+                AfterUpload();
+
+                /*UploadHelper.UploadAsync(file, token, new Action(() =>
                 {
                     File.Delete(file);
                     AfterUpload();
-                }));
+                }));*/
             }
             else
             {
@@ -161,7 +183,7 @@ namespace Windows_qPaste
 
         private void AfterUpload()
         {
-            ToastForm.DontView();
+            //ToastForm.DontView();
             isUploading = false;
         }
 

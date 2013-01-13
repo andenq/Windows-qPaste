@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,7 +23,7 @@ namespace Windows_qPaste
         {
             InitializeComponent();
             TopMost = false;
-            //Show();
+            //ShowDialog();
         }
 
         private static ToastForm instance;
@@ -35,7 +36,7 @@ namespace Windows_qPaste
         {
             if (instance == null)
             {
-                new Thread(new ThreadStart(() => { instance = new ToastForm(); instance.ShowDialog(); })).Start();
+                new Thread(new ThreadStart(() => { instance = null; instance = new ToastForm(); instance.ShowDialog(); })).Start();
             }
 
             /*instance.Invoke(new Action(() => 
@@ -48,10 +49,18 @@ namespace Windows_qPaste
         {
             if (instance != null)
             {
-                instance.Invoke(new Action(() =>
+                try
                 {
-                    instance.Hide();
-                }));
+                    instance.Invoke(new Action(() =>
+                    {
+                        instance.Close();
+                        instance.Dispose();
+                    }));
+                }
+                catch (InvalidOperationException e)
+                {
+                    Debug.WriteLine("Exception: " + e.ToString());
+                }
             }
         }
 
