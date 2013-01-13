@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Windows_qPaste
@@ -13,6 +15,24 @@ namespace Windows_qPaste
     {
         //public static readonly string HOST = "http://127.0.0.1:1337";
         public static readonly string HOST = "http://qpaste.eu01.aws.af.cm";
+
+        /// <summary>
+        /// Upload file to server.
+        /// </summary>
+        /// <param name="filepath">Path to the file to upload.</param>
+        /// <param name="token">Upload token.</param>
+        /// <param name="callback">Delegate to run after upload is complete.</param>
+        public static void UploadAsync(string filepath, Token token, Action callback)
+        {
+            Thread thread = new Thread(new ThreadStart(() =>
+            {
+                Debug.WriteLine("Uploading Async");
+                Upload(filepath, token);
+                Debug.WriteLine("Upload done, running callback");
+                callback();
+            }));
+            thread.Start();
+        }
 
         /// <summary>
         /// Upload file to server.

@@ -55,7 +55,8 @@ namespace Windows_qPaste
         {
             if (isUploading)
                 return;
-            ToastForm toast = new ToastForm();
+            //ToastForm toast = new ToastForm();
+            ToastForm.View();
             isUploading = true;
             if (Clipboard.ContainsFileDropList())
             {
@@ -66,6 +67,7 @@ namespace Windows_qPaste
                     ClipboardHelper.Paste(token.link);
 
                     string tempfile = Path.GetTempPath() + "\\qpaste.zip";
+                    File.Delete(tempfile);
                     using (ZipFile zip = new ZipFile(tempfile))
                     {
                         foreach (string file in files)
@@ -84,8 +86,11 @@ namespace Windows_qPaste
                         zip.Save();
                     }
 
-                    UploadHelper.Upload(tempfile, token);
-                    File.Delete(tempfile);
+                    UploadHelper.UploadAsync(tempfile, token, new Action(() => 
+                    {
+                        File.Delete(tempfile);
+                        AfterUpload();
+                    }));
                 }
                 else
                 {
@@ -98,17 +103,24 @@ namespace Windows_qPaste
                         if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                         {
                             string tempfile = Path.GetTempPath() + "\\"+ Path.GetFileNameWithoutExtension(file) +".zip";
+                            File.Delete(tempfile);
                             using (ZipFile zip = new ZipFile(tempfile))
                             {
                                 zip.AddDirectory(file, "");
                                 zip.Save();
                             }
-                            UploadHelper.Upload(tempfile, token);
-                            File.Delete(tempfile);
+                            UploadHelper.UploadAsync(tempfile, token, new Action(() =>
+                            {
+                                File.Delete(tempfile);
+                                AfterUpload();
+                            }));
                         }
                         else
                         {
-                            UploadHelper.Upload(file, token);
+                            UploadHelper.UploadAsync(file, token, new Action(() =>
+                            {
+                                AfterUpload();
+                            }));
                         }
                     }
                 }
@@ -116,23 +128,40 @@ namespace Windows_qPaste
             else if (Clipboard.ContainsImage())
             {
                 string file = Path.GetTempPath() + "\\qpaste_temp.png";
+                File.Delete(file);
                 Image image = Clipboard.GetImage();
                 image.Save(file, ImageFormat.Png);
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
-                UploadHelper.Upload(file, token);
-                File.Delete(file);
+                UploadHelper.UploadAsync(file, token, new Action(() =>
+                {
+                    File.Delete(file);
+                    AfterUpload();
+                }));
             }
             else if (Clipboard.ContainsText())
             {
                 string file = Path.GetTempPath() + "\\qpaste_temp.txt";
+                File.Delete(file);
                 File.WriteAllText(file, Clipboard.GetText());
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
-                UploadHelper.Upload(file, token);
-                File.Delete(file);
+                UploadHelper.UploadAsync(file, token, new Action(() =>
+                {
+                    File.Delete(file);
+                    AfterUpload();
+                }));
             }
-            toast.Close();
+            else
+            {
+                AfterUpload();
+            }
+            //toast.Close();
+        }
+
+        private void AfterUpload()
+        {
+            ToastForm.DontView();
             isUploading = false;
         }
 

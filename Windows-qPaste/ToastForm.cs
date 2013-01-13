@@ -24,28 +24,35 @@ namespace Windows_qPaste
             Show();
         }
 
+        private static ToastForm instance = new ToastForm();
         protected override bool ShowWithoutActivation
         {
             get { return true; }
         }
 
-        /*public static void View()
+        public static void View()
         {
             if (instance == null)
             {
                 instance = new ToastForm();
             }
 
-            instance.Show();
+            instance.Invoke(new Action(() => 
+            {
+                instance.Show();
+            }));
         }
 
         public static void DontView()
         {
             if (instance != null)
             {
-                instance.Hide();
+                instance.Invoke(new Action(() =>
+                {
+                    instance.Hide();
+                }));
             }
-        }*/
+        }
 
         private void ToastForm_Load(object sender, EventArgs e)
         {
