@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,10 +22,10 @@ namespace Windows_qPaste
         {
             InitializeComponent();
             TopMost = false;
-            Show();
+            //Show();
         }
 
-        private static ToastForm instance = new ToastForm();
+        private static ToastForm instance;
         protected override bool ShowWithoutActivation
         {
             get { return true; }
@@ -34,13 +35,13 @@ namespace Windows_qPaste
         {
             if (instance == null)
             {
-                instance = new ToastForm();
+                new Thread(new ThreadStart(() => { instance = new ToastForm(); instance.ShowDialog(); })).Start();
             }
 
-            instance.Invoke(new Action(() => 
+            /*instance.Invoke(new Action(() => 
             {
                 instance.Show();
-            }));
+            }));*/
         }
 
         public static void DontView()
