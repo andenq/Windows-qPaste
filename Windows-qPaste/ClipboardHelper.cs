@@ -72,6 +72,10 @@ namespace Windows_qPaste
             {
                 Paste(name + ": " + link);
             }
+            else
+            {
+                Paste(link);
+            }
         }
 
         /// <summary>
