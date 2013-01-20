@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Krystalware.UploadHelper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,13 +43,23 @@ namespace Windows_qPaste
         /// <param name="token">Upload token.</param>
         public static void Upload(string filepath, Token token)
         {
-            var yourUrl = HOST + "/upload";
+            //Library from http://aspnetupload.com/Upload-File-POST-HttpWebRequest-WebClient-RFC-1867.aspx
+            string url = HOST + "/upload";
+            UploadFile[] files = new UploadFile[] 
+            { 
+                new UploadFile(filepath, "upload", "plain/text")
+            };
+            NameValueCollection form = new NameValueCollection();
+            form["token"] = token.token;
+            string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
+            
+            /*var yourUrl = HOST + "/upload";
             var httpForm = new HttpForm(yourUrl);
             httpForm.AttachFile("upload", filepath);
             httpForm.SetValue("token", token.token);
             //ExecuteSecure(() => { StatusLabel.Text = "Uploading file: " + Path.GetFileName(filepath); });
             //response = httpForm.Submit();
-            httpForm.Submit();
+            httpForm.Submit();*/
         }
 
         /// <summary>
@@ -66,5 +78,6 @@ namespace Windows_qPaste
             Token json = JsonConvert.DeserializeObject<Token>(text);
             return json;
         }
+
     }
 }

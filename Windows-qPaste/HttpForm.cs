@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Windows_qPaste
 {
+    /// <summary>
+    /// NO LONGER USED!
+    /// </summary>
     public class HttpForm {
 
         private Dictionary<string, string> _files = new Dictionary<string, string>();

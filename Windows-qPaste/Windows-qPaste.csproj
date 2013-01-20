@@ -40,6 +40,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Ionic.Utils.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Krystalware.UploadHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\Krystalware.UploadHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
@@ -110,6 +114,7 @@
     <Content Include="Libraries\Ionic.Utils.Zip.dll" />
     <None Include="ajax-loader.gif" />
     <Content Include="Libraries\InputSimulator.dll" />
+    <Content Include="Libraries\Krystalware.UploadHelper.dll" />
     <Content Include="Libraries\Newtonsoft.Json.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
