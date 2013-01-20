@@ -16,7 +16,8 @@ namespace Windows_qPaste
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            new MainForm();
+            Application.Run();
         }
     }
 }

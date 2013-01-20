@@ -71,15 +71,5 @@ namespace Windows_qPaste
                 AutostartHelper.UnSetAutostart();
             }
         }
-
-        bool firstTimeOpen = true;
-        private void MainForm_Shown(object sender, EventArgs e)
-        {
-            if (firstTimeOpen)
-            {
-                Hide();
-                firstTimeOpen = false;
-            }
-        }
     }
 }

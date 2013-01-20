@@ -22,7 +22,6 @@ namespace Windows_qPaste
         private static readonly object _locker = new object();
         KeyboardHook hook = new KeyboardHook();
         System.Windows.Forms.Timer hookTimer = new System.Windows.Forms.Timer();
-        bool isUploading = false;
         public HotkeyHandler()
         {
             //Hook to global keyboard for qPaste Hotkey
