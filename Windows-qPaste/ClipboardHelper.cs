@@ -14,6 +14,7 @@ namespace Windows_qPaste
 {
     class ClipboardHelper
     {
+        private static readonly object _locker = new object();
         private static string type = "";
         private static StringCollection files = null;
         private static Image image = null;
@@ -61,44 +62,25 @@ namespace Windows_qPaste
         }
 
         /// <summary>
-        /// Populates the clipboard with appropiate link and pastes it.
+        /// Populates the clipboard with appropiate link, pastes it and then restores the clipboard.
         /// </summary>
-        /// <param name="link">Link to paste.</param>
+        /// <param name="link">String to paste.</param>
         public static void Paste(string link)
         {
-            if (false)
+            lock (_locker)
             {
-                InputSimulator.SimulateTextEntry(link + " ");
-            }
-            /*if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
-            {
-                Thread t = new Thread(new ThreadStart(() => { Paste(link); }));
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
-            }
-            else
-            {*/
-            else
-            {
-                ThreadStart action = new ThreadStart(() => { 
+                //InputSimulator.SimulateTextEntry(link + " "); //"Pastes" without using clipboard
+                ThreadStart action = new ThreadStart(() =>
+                {
                     ClipboardHelper.MakeRestorePoint();
                     Debug.WriteLine("Pasting: " + link);
-
                     string toPaste = link + " ";
                     Clipboard.SetText(toPaste);
-
                     //The clipboard is slow, we have to wait for it!
-                    //do
-                        Thread.Sleep(100);
-                    //while (!Clipboard.GetText().Equals(toPaste));
-                    /*while (!Clipboard.GetText().Equals(toPaste))
-                        Thread.Sleep(500);*/
-
+                    Thread.Sleep(250);
                     InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-
-                    Thread.Sleep(100);
+                    Thread.Sleep(250);
                     ClipboardHelper.Restore();
-                    //}
                 });
                 Thread thread = new Thread(action);
                 thread.SetApartmentState(ApartmentState.STA);
