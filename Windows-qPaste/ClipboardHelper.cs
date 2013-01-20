@@ -66,7 +66,7 @@ namespace Windows_qPaste
         /// <param name="link">Link to paste.</param>
         public static void Paste(string link)
         {
-            if (true)
+            if (false)
             {
                 InputSimulator.SimulateTextEntry(link + " ");
             }
@@ -87,15 +87,15 @@ namespace Windows_qPaste
                 Clipboard.SetText(toPaste);
 
                 //The clipboard is slow, we have to wait for it!
-                do
-                    Thread.Sleep(1000);
-                while (!Clipboard.GetText().Equals(toPaste));
+                //do
+                    Thread.Sleep(100);
+                //while (!Clipboard.GetText().Equals(toPaste));
                 /*while (!Clipboard.GetText().Equals(toPaste))
                     Thread.Sleep(500);*/
 
                 InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
 
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
                 ClipboardHelper.Restore();
                 //}
             }
