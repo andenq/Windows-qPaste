@@ -23,7 +23,6 @@ namespace Windows_qPaste
         {
             InitializeComponent();
             TopMost = false;
-            //ShowDialog();
         }
 
         private static ToastForm instance;
@@ -34,15 +33,15 @@ namespace Windows_qPaste
 
         public static void View()
         {
-            if (instance == null)
+            ThreadStart action = new ThreadStart(() =>
             {
-                new Thread(new ThreadStart(() => { instance = null; instance = new ToastForm(); instance.ShowDialog(); })).Start();
-            }
-
-            /*instance.Invoke(new Action(() => 
-            {
-                instance.Show();
-            }));*/
+                instance = null; 
+                instance = new ToastForm(); 
+                instance.ShowDialog();
+            });
+            Thread thread = new Thread(action);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         public static void DontView()
