@@ -62,9 +62,22 @@ namespace Windows_qPaste
         }
 
         /// <summary>
-        /// Populates the clipboard with appropiate link, pastes it and then restores the clipboard.
+        /// Poplates the clipboard with link (and name if function turned on), pastes it and then restores the clipboard. 
         /// </summary>
-        /// <param name="link">String to paste.</param>
+        /// <param name="name">Name to post with link.</param>
+        /// <param name="link">Link to paste.</param>
+        public static void PasteWithName(string name, string link)
+        {
+            if ((bool)Properties.Settings.Default["putname"])
+            {
+                Paste(name + ": " + link);
+            }
+        }
+
+        /// <summary>
+        /// Populates the clipboard with link, pastes it and then restores the clipboard.
+        /// </summary>
+        /// <param name="link">Link to paste.</param>
         public static void Paste(string link)
         {
             lock (_locker)
@@ -73,7 +86,6 @@ namespace Windows_qPaste
                 ThreadStart action = new ThreadStart(() =>
                 {
                     ClipboardHelper.MakeRestorePoint();
-                    Debug.WriteLine("Pasting: " + link);
                     string toPaste = link + " ";
                     Clipboard.SetText(toPaste);
                     //The clipboard is slow, we have to wait for it!

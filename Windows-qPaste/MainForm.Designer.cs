@@ -34,6 +34,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.CombineZIPCheckbox = new System.Windows.Forms.CheckBox();
             this.AutostartCheckbox = new System.Windows.Forms.CheckBox();
+            this.PutnameCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // notifyIcon
@@ -69,7 +70,7 @@
             // AutostartCheckbox
             // 
             this.AutostartCheckbox.AutoSize = true;
-            this.AutostartCheckbox.Location = new System.Drawing.Point(17, 80);
+            this.AutostartCheckbox.Location = new System.Drawing.Point(17, 107);
             this.AutostartCheckbox.Name = "AutostartCheckbox";
             this.AutostartCheckbox.Size = new System.Drawing.Size(148, 21);
             this.AutostartCheckbox.TabIndex = 2;
@@ -77,11 +78,23 @@
             this.AutostartCheckbox.UseVisualStyleBackColor = true;
             this.AutostartCheckbox.CheckedChanged += new System.EventHandler(this.AutostartCheckbox_CheckedChanged);
             // 
+            // PutnameCheckbox
+            // 
+            this.PutnameCheckbox.AutoSize = true;
+            this.PutnameCheckbox.Location = new System.Drawing.Point(17, 80);
+            this.PutnameCheckbox.Name = "PutnameCheckbox";
+            this.PutnameCheckbox.Size = new System.Drawing.Size(219, 21);
+            this.PutnameCheckbox.TabIndex = 3;
+            this.PutnameCheckbox.Text = "Put filename (or type) with link";
+            this.PutnameCheckbox.UseVisualStyleBackColor = true;
+            this.PutnameCheckbox.CheckedChanged += new System.EventHandler(this.PutnameCheckbox_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(357, 255);
+            this.Controls.Add(this.PutnameCheckbox);
             this.Controls.Add(this.AutostartCheckbox);
             this.Controls.Add(this.CombineZIPCheckbox);
             this.Controls.Add(this.label1);
@@ -101,6 +114,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox CombineZIPCheckbox;
         private System.Windows.Forms.CheckBox AutostartCheckbox;
+        private System.Windows.Forms.CheckBox PutnameCheckbox;
     }
 }
 

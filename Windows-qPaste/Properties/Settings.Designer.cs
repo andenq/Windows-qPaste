@@ -34,5 +34,17 @@ namespace Windows_qPaste.Properties {
                 this["combinezip"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool putname {
+            get {
+                return ((bool)(this["putname"]));
+            }
+            set {
+                this["putname"] = value;
+            }
+        }
     }
 }

@@ -28,12 +28,7 @@ namespace Windows_qPaste
                 AutostartCheckbox.Checked = true;
             }
             CombineZIPCheckbox.Checked = (bool) Properties.Settings.Default["combinezip"];
-
-            Debug.WriteLine(Clipboard.ContainsFileDropList().ToString());
-            Debug.WriteLine(Clipboard.ContainsData(DataFormats.FileDrop).ToString());
-            Debug.WriteLine(Clipboard.ContainsData(DataFormats.Text).ToString());
-            Debug.WriteLine(Clipboard.GetData(DataFormats.Text));
-
+            PutnameCheckbox.Checked = (bool) Properties.Settings.Default["putname"];
             MenuItem[] items = new MenuItem[1];
             items[0] = new MenuItem("Exit", new EventHandler((object o, EventArgs args) => {
                 notifyIcon.Visible = false;
@@ -70,6 +65,12 @@ namespace Windows_qPaste
             {
                 AutostartHelper.UnSetAutostart();
             }
+        }
+
+        private void PutnameCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default["putname"] = PutnameCheckbox.Checked;
+            Properties.Settings.Default.Save();
         }
     }
 }

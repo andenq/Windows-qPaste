@@ -46,22 +46,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icons\go_up.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="InputSimulator, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\InputSimulator.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Ionic.Utils.Zip, Version=1.5.2.1, Culture=neutral, PublicKeyToken=c551e179877da246, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Ionic.Utils.Zip.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Krystalware.UploadHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Krystalware.UploadHelper.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -127,11 +134,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icons\go_up.ico" />
-    <Content Include="Libraries\Ionic.Utils.Zip.dll" />
+    <EmbeddedResource Include="Libraries\Ionic.Utils.Zip.dll" />
     <None Include="ajax-loader.gif" />
-    <Content Include="Libraries\InputSimulator.dll" />
-    <Content Include="Libraries\Krystalware.UploadHelper.dll" />
-    <Content Include="Libraries\Newtonsoft.Json.dll" />
+    <EmbeddedResource Include="Libraries\InputSimulator.dll" />
+    <EmbeddedResource Include="Libraries\Krystalware.UploadHelper.dll" />
+    <EmbeddedResource Include="Libraries\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
