@@ -17,7 +17,7 @@ namespace Windows_qPaste
     class UploadHelper
     {
         //public static readonly string HOST = "http://127.0.0.1:1337";
-        public static readonly string HOST = "http://qpaste.eu01.aws.af.cm";
+        public static readonly string HOST = "http://qpaste.rs.af.cm";
 
         /// <summary>
         /// Upload file to server.
