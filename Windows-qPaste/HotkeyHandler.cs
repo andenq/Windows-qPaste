@@ -19,6 +19,7 @@ namespace Windows_qPaste
     /// </summary>
     class HotkeyHandler
     {
+        private static readonly object _locker = new object();
         KeyboardHook hook = new KeyboardHook();
         System.Windows.Forms.Timer hookTimer = new System.Windows.Forms.Timer();
         bool isUploading = false;
@@ -47,143 +48,110 @@ namespace Windows_qPaste
                 Debug.WriteLine("Key already bound");
             }
         }
+
+        private void UploadFiles(StringCollection files)
+        {
+            if (files.Count > 1 && (bool)Properties.Settings.Default["combinezip"])
+            {
+                Token token = UploadHelper.getToken();
+                ClipboardHelper.Paste(token.link);
+
+                string tempfile = Path.GetTempPath() + "\\qpaste.zip";
+                File.Delete(tempfile);
+                using (ZipFile zip = new ZipFile(tempfile))
+                {
+                    foreach (string file in files)
+                    {
+                        FileAttributes attr = File.GetAttributes(file);
+                        if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            Debug.WriteLine(Path.GetFileName(file));
+                            zip.AddDirectory(file, Path.GetFileName(file));
+                        }
+                        else
+                        {
+                            zip.AddFile(file, "");
+                        }
+                    }
+                    zip.Save();
+                }
+
+                UploadHelper.Upload(tempfile, token);
+                File.Delete(tempfile);
+            }
+            else
+            {
+                foreach (string file in files)
+                {
+                    Token token = UploadHelper.getToken();
+                    ClipboardHelper.Paste(token.link);
+
+                    FileAttributes attr = File.GetAttributes(file);
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    {
+                        string tempfile = Path.GetTempPath() + "\\" + Path.GetFileNameWithoutExtension(file) + ".zip";
+                        File.Delete(tempfile);
+                        using (ZipFile zip = new ZipFile(tempfile))
+                        {
+                            zip.AddDirectory(file, "");
+                            zip.Save();
+                        }
+
+                        UploadHelper.Upload(tempfile, token);
+                        File.Delete(tempfile);
+                    }
+                    else
+                    {
+                        UploadHelper.Upload(file, token);
+                    }
+                }
+            }
+        }
+
+        private void UploadImage(Image image)
+        {
+            string file = Path.GetTempPath() + "\\qpaste_temp.png";
+            File.Delete(file);
+            image.Save(file, ImageFormat.Png);
+            Token token = UploadHelper.getToken();
+            ClipboardHelper.Paste(token.link);
+            UploadHelper.Upload(file, token);
+            File.Delete(file);
+        }
+
+        private void UploadText(string text)
+        {
+            string file = Path.GetTempPath() + "\\qpaste_temp.txt";
+            File.Delete(file);
+            File.WriteAllText(file, text);
+            Token token = UploadHelper.getToken();
+            ClipboardHelper.Paste(token.link);
+            UploadHelper.Upload(file, token);
+            File.Delete(file);
+        }
         
         /// <summary>
         /// Handle upload of data. Should be run in different thread to avoid UI-blocking.
         /// </summary>
         private void HandleUpload(string ctype, object content)
         {
-            if (isUploading)
-                return;
-            ToastForm.View();
-            isUploading = true;
-            if (ctype.Equals("files"))
+            lock (_locker)
             {
-                StringCollection files = (StringCollection)content;
-                if (files.Count > 1 && (bool)Properties.Settings.Default["combinezip"])
+                ToastForm.View();
+                if (ctype.Equals("files"))
                 {
-                    Token token = UploadHelper.getToken();
-                    ClipboardHelper.Paste(token.link);
-
-                    string tempfile = Path.GetTempPath() + "\\qpaste.zip";
-                    File.Delete(tempfile);
-                    using (ZipFile zip = new ZipFile(tempfile))
-                    {
-                        foreach (string file in files)
-                        {
-                            FileAttributes attr = File.GetAttributes(file);
-                            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-                            {
-                                Debug.WriteLine(Path.GetFileName(file));
-                                zip.AddDirectory(file, Path.GetFileName(file));
-                            }
-                            else
-                            {
-                                zip.AddFile(file, "");
-                            }
-                        }
-                        zip.Save();
-                    }
-
-                    UploadHelper.Upload(tempfile, token);
-                    File.Delete(tempfile);
-                    AfterUpload();
-
-                    /*UploadHelper.UploadAsync(tempfile, token, new Action(() => 
-                    {
-                        File.Delete(tempfile);
-                        AfterUpload();
-                    }));*/
+                    UploadFiles((StringCollection)content);
                 }
-                else
+                else if (ctype.Equals("image"))
                 {
-                    foreach (string file in files)
-                    {
-                        Token token = UploadHelper.getToken();
-                        ClipboardHelper.Paste(token.link);
-
-                        FileAttributes attr = File.GetAttributes(file);
-                        if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-                        {
-                            string tempfile = Path.GetTempPath() + "\\"+ Path.GetFileNameWithoutExtension(file) +".zip";
-                            File.Delete(tempfile);
-                            using (ZipFile zip = new ZipFile(tempfile))
-                            {
-                                zip.AddDirectory(file, "");
-                                zip.Save();
-                            }
-
-                            UploadHelper.Upload(tempfile, token);
-                            File.Delete(tempfile);
-                            AfterUpload();
-
-                            /*UploadHelper.UploadAsync(tempfile, token, new Action(() =>
-                            {
-                                File.Delete(tempfile);
-                                AfterUpload();
-                            }));*/
-                        }
-                        else
-                        {
-                            UploadHelper.Upload(file, token);
-                            AfterUpload();
-
-                            /*UploadHelper.UploadAsync(file, token, new Action(() =>
-                            {
-                                AfterUpload();
-                            }));*/
-                        }
-                    }
+                    UploadImage((Image)content);
                 }
-            }
-            else if (ctype.Equals("image"))
-            {
-                string file = Path.GetTempPath() + "\\qpaste_temp.png";
-                File.Delete(file);
-                Image image = (Image)content;
-                image.Save(file, ImageFormat.Png);
-                Token token = UploadHelper.getToken();
-                ClipboardHelper.Paste(token.link);
-
-                UploadHelper.Upload(file, token);
-                File.Delete(file);
-                AfterUpload();
-
-                /*UploadHelper.UploadAsync(file, token, new Action(() =>
+                else if (ctype.Equals("text"))
                 {
-                    File.Delete(file);
-                    AfterUpload();
-                }));*/
+                    UploadText((string)content);
+                }
+                ToastForm.DontView();
             }
-            else if (ctype.Equals("text"))
-            {
-                string file = Path.GetTempPath() + "\\qpaste_temp.txt";
-                File.Delete(file);
-                File.WriteAllText(file, (string)content);
-                Token token = UploadHelper.getToken();
-                ClipboardHelper.Paste(token.link);
-
-                UploadHelper.Upload(file, token);
-                File.Delete(file);
-                AfterUpload();
-
-                /*UploadHelper.UploadAsync(file, token, new Action(() =>
-                {
-                    File.Delete(file);
-                    AfterUpload();
-                }));*/
-            }
-            else
-            {
-                AfterUpload();
-            }
-            //toast.Close();
-        }
-
-        private void AfterUpload()
-        {
-            ToastForm.DontView();
-            isUploading = false;
         }
 
         private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
