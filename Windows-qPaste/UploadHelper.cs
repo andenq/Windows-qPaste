@@ -1,4 +1,5 @@
 ﻿using Krystalware.UploadHelper;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -45,9 +46,10 @@ namespace Windows_qPaste
         {
             //Library from http://aspnetupload.com/Upload-File-POST-HttpWebRequest-WebClient-RFC-1867.aspx
             string url = HOST + "/upload";
+            string ctype;
             UploadFile[] files = new UploadFile[] 
             { 
-                new UploadFile(filepath, "upload", "plain/text")
+                new UploadFile(filepath, "upload", TryGetContentType(filepath, out ctype) ? ctype : "application/octet-stream")
             };
             NameValueCollection form = new NameValueCollection();
             form["token"] = token.token;
@@ -79,5 +81,50 @@ namespace Windows_qPaste
             return json;
         }
 
+        /// <summary>
+        /// Attempts to query registry for content-type of supplied file name.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static bool TryGetContentType(string fileName, out string contentType)
+        {
+            try
+            {
+                RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"MIME\Database\Content Type");
+
+                if (key != null)
+                {
+                    foreach (string keyName in key.GetSubKeyNames())
+                    {
+                        RegistryKey subKey = key.OpenSubKey(keyName);
+                        if (subKey != null)
+                        {
+                            string subKeyValue = (string)subKey.GetValue("Extension");
+
+                            if (!string.IsNullOrEmpty(subKeyValue))
+                            {
+                                if (string.Compare(Path.GetExtension(fileName).ToUpperInvariant(),
+                                                    subKeyValue.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase) ==
+                                    0)
+                                {
+                                    contentType = keyName;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            {
+                // fail silently
+                // TODO: rethrow registry access denied errors
+            }
+            // ReSharper restore EmptyGeneralCatchClause
+            contentType = "";
+            return false;
+        }
     }
 }
