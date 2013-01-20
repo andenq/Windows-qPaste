@@ -80,24 +80,29 @@ namespace Windows_qPaste
             {*/
             else
             {
-                ClipboardHelper.MakeRestorePoint();
-                Debug.WriteLine("Pasting: " + link);
+                ThreadStart action = new ThreadStart(() => { 
+                    ClipboardHelper.MakeRestorePoint();
+                    Debug.WriteLine("Pasting: " + link);
 
-                string toPaste = link + " ";
-                Clipboard.SetText(toPaste);
+                    string toPaste = link + " ";
+                    Clipboard.SetText(toPaste);
 
-                //The clipboard is slow, we have to wait for it!
-                //do
+                    //The clipboard is slow, we have to wait for it!
+                    //do
+                        Thread.Sleep(100);
+                    //while (!Clipboard.GetText().Equals(toPaste));
+                    /*while (!Clipboard.GetText().Equals(toPaste))
+                        Thread.Sleep(500);*/
+
+                    InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+
                     Thread.Sleep(100);
-                //while (!Clipboard.GetText().Equals(toPaste));
-                /*while (!Clipboard.GetText().Equals(toPaste))
-                    Thread.Sleep(500);*/
-
-                InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-
-                Thread.Sleep(100);
-                ClipboardHelper.Restore();
-                //}
+                    ClipboardHelper.Restore();
+                    //}
+                });
+                Thread thread = new Thread(action);
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
         }
     }

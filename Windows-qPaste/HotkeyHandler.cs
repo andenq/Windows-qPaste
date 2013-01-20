@@ -51,16 +51,15 @@ namespace Windows_qPaste
         /// <summary>
         /// Handle upload of data. Should be run in different thread to avoid UI-blocking.
         /// </summary>
-        private void HandleUpload()
+        private void HandleUpload(string ctype, object content)
         {
             if (isUploading)
                 return;
-            //ToastForm toast = new ToastForm();
-            //ToastForm.View();
+            ToastForm.View();
             isUploading = true;
-            if (Clipboard.ContainsFileDropList())
+            if (ctype.Equals("files"))
             {
-                StringCollection files = Clipboard.GetFileDropList();
+                StringCollection files = (StringCollection)content;
                 if (files.Count > 1 && (bool)Properties.Settings.Default["combinezip"])
                 {
                     Token token = UploadHelper.getToken();
@@ -137,11 +136,11 @@ namespace Windows_qPaste
                     }
                 }
             }
-            else if (Clipboard.ContainsImage())
+            else if (ctype.Equals("image"))
             {
                 string file = Path.GetTempPath() + "\\qpaste_temp.png";
                 File.Delete(file);
-                Image image = Clipboard.GetImage();
+                Image image = (Image)content;
                 image.Save(file, ImageFormat.Png);
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
@@ -156,11 +155,11 @@ namespace Windows_qPaste
                     AfterUpload();
                 }));*/
             }
-            else if (Clipboard.ContainsText())
+            else if (ctype.Equals("text"))
             {
                 string file = Path.GetTempPath() + "\\qpaste_temp.txt";
                 File.Delete(file);
-                File.WriteAllText(file, Clipboard.GetText());
+                File.WriteAllText(file, (string)content);
                 Token token = UploadHelper.getToken();
                 ClipboardHelper.Paste(token.link);
 
@@ -183,14 +182,30 @@ namespace Windows_qPaste
 
         private void AfterUpload()
         {
-            //ToastForm.DontView();
+            ToastForm.DontView();
             isUploading = false;
         }
 
         private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
-            Thread t = new Thread(new ThreadStart(HandleUpload));
-            t.SetApartmentState(ApartmentState.STA);
+            string ctype = "";
+            object content = null;
+            if (Clipboard.ContainsFileDropList()) 
+            {
+                ctype = "files";
+                content = Clipboard.GetFileDropList();
+            }
+            else if (Clipboard.ContainsImage())
+            {
+                ctype = "image";
+                content = Clipboard.GetImage();
+            }
+            else if (Clipboard.ContainsText())
+            {
+                ctype = "text";
+                content = Clipboard.GetText();
+            }
+            Thread t = new Thread(new ThreadStart(() => { HandleUpload(ctype, content); }));
             t.Start();
         }
     }
