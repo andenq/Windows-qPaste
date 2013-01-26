@@ -33,6 +33,7 @@ namespace Windows_qPaste
                 notifyIcon.Visible = false;
                 Environment.Exit(0);
             }));
+            notifyIcon.Text += " - " + Program.ProductVersion;
             notifyIcon.ContextMenu = new ContextMenu(items);
             
         }

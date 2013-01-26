@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -20,6 +21,21 @@ namespace Windows_qPaste
             Application.SetCompatibleTextRenderingDefault(false);
             mainform = new MainForm();
             Application.Run();
+        }
+
+        public static string ProductVersion
+        {
+            get
+            {
+                if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed)
+                {
+                    return System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+                }
+                else
+                {
+                    return "Debug";
+                }
+            }
         }
 
         static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
