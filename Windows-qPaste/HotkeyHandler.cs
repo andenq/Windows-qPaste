@@ -111,7 +111,7 @@ namespace Windows_qPaste
 
         private void UploadImage(Image image)
         {
-            string file = Path.GetTempPath() + "\\qpaste_temp.png";
+            string file = Path.GetTempPath() + "\\qpaste_image.png";
             File.Delete(file);
             image.Save(file, ImageFormat.Png);
             Token token = UploadHelper.getToken(file);
@@ -122,7 +122,7 @@ namespace Windows_qPaste
 
         private void UploadText(string text)
         {
-            string file = Path.GetTempPath() + "\\qpaste_temp.txt";
+            string file = Path.GetTempPath() + "\\qpaste_text.txt";
             File.Delete(file);
             File.WriteAllText(file, text);
             Token token = UploadHelper.getToken(file);
