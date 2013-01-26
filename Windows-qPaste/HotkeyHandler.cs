@@ -51,9 +51,6 @@ namespace Windows_qPaste
         {
             if (files.Count > 1 && (bool)Properties.Settings.Default["combinezip"])
             {
-                Token token = UploadHelper.getToken();
-                ClipboardHelper.PasteWithName("Multiple files", token.link);
-
                 string tempfile = Path.GetTempPath() + "\\qpaste.zip";
                 File.Delete(tempfile);
                 using (ZipFile zip = new ZipFile(tempfile))
@@ -73,7 +70,8 @@ namespace Windows_qPaste
                     }
                     zip.Save();
                 }
-
+                Token token = UploadHelper.getToken(tempfile);
+                ClipboardHelper.PasteWithName("Multiple files", token.link);
                 UploadHelper.Upload(tempfile, token);
                 File.Delete(tempfile);
             }
@@ -81,12 +79,14 @@ namespace Windows_qPaste
             {
                 foreach (string file in files)
                 {
-                    Token token = UploadHelper.getToken();
-                    ClipboardHelper.PasteWithName(Path.GetFileName(file), token.link);
+                    Token token = null;
 
                     FileAttributes attr = File.GetAttributes(file);
                     if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                     {
+                        token = UploadHelper.getToken(file);
+                        ClipboardHelper.PasteWithName(Path.GetFileName(file), token.link);
+
                         string tempfile = Path.GetTempPath() + "\\" + Path.GetFileNameWithoutExtension(file) + ".zip";
                         File.Delete(tempfile);
                         using (ZipFile zip = new ZipFile(tempfile))
@@ -100,6 +100,9 @@ namespace Windows_qPaste
                     }
                     else
                     {
+                        token = UploadHelper.getToken(file);
+                        ClipboardHelper.PasteWithName(Path.GetFileName(file), token.link);
+
                         UploadHelper.Upload(file, token);
                     }
                 }
@@ -111,7 +114,7 @@ namespace Windows_qPaste
             string file = Path.GetTempPath() + "\\qpaste_temp.png";
             File.Delete(file);
             image.Save(file, ImageFormat.Png);
-            Token token = UploadHelper.getToken();
+            Token token = UploadHelper.getToken(file);
             ClipboardHelper.PasteWithName("Image", token.link);
             UploadHelper.Upload(file, token);
             File.Delete(file);
@@ -122,7 +125,7 @@ namespace Windows_qPaste
             string file = Path.GetTempPath() + "\\qpaste_temp.txt";
             File.Delete(file);
             File.WriteAllText(file, text);
-            Token token = UploadHelper.getToken();
+            Token token = UploadHelper.getToken(file);
             ClipboardHelper.PasteWithName("Text snippet", token.link);
             UploadHelper.Upload(file, token);
             File.Delete(file);

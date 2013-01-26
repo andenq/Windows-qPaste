@@ -17,6 +17,7 @@ namespace Windows_qPaste
     {
         public static readonly string HOST = "http://127.0.0.1:1337";
         //public static readonly string HOST = "http://qpaste.rs.af.cm";
+        //public static readonly string HOST = "http://qpaste-dev.rs.af.cm";
 
         /// <summary>
         /// Upload file to server.
@@ -26,14 +27,15 @@ namespace Windows_qPaste
         /// <param name="callback">Delegate to run after upload is complete.</param>
         public static void UploadAsync(string filepath, Token token, Action callback)
         {
-            Thread thread = new Thread(new ThreadStart(() =>
+            // Old
+            /*Thread thread = new Thread(new ThreadStart(() =>
             {
                 Debug.WriteLine("Uploading Async");
                 Upload(filepath, token);
                 Debug.WriteLine("Upload done, running callback");
                 callback();
             }));
-            thread.Start();
+            thread.Start();*/
         }
 
         /// <summary>
@@ -44,49 +46,63 @@ namespace Windows_qPaste
         public static void Upload(string filepath, Token token)
         {
             //Library from http://aspnetupload.com/Upload-File-POST-HttpWebRequest-WebClient-RFC-1867.aspx
-            string url = HOST + "/upload";
-            string ctype;
+            //string url = HOST + "/upload";
+            string url = "http://qpaste.s3.amazonaws.com/";
             UploadFile[] files = new UploadFile[] 
             { 
-                new UploadFile(filepath, "upload", TryGetContentType(filepath, out ctype) ? ctype : "application/octet-stream")
+                new UploadFile(filepath, "file", token.storage.s3Policy.conditions.mime)
             };
             NameValueCollection form = new NameValueCollection();
-            form["token"] = token.token;
-            string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
-            
-            /*var yourUrl = HOST + "/upload";
-            var httpForm = new HttpForm(yourUrl);
-            httpForm.AttachFile("upload", filepath);
-            httpForm.SetValue("token", token.token);
-            //ExecuteSecure(() => { StatusLabel.Text = "Uploading file: " + Path.GetFileName(filepath); });
-            //response = httpForm.Submit();
-            httpForm.Submit();*/
+            form["key"] = token.storage.s3Policy.conditions.key;
+            form["AWSAccessKeyId"] = token.storage.s3Key;
+            form["Policy"] = token.storage.s3PolicyBase64;
+            form["Signature"] = token.storage.s3Signature;
+            form["Bucket"] = token.storage.s3Policy.conditions.bucket;
+            form["acl"] = token.storage.s3Policy.conditions.acl;
+            form["Content-Type"] = token.storage.s3Policy.conditions.mime;
+
+            try
+            {
+                string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
+            }
+            catch (System.Net.WebException ex)
+            {
+                string output = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                Console.WriteLine(output);
+                Debug.WriteLine(output);
+            }
         }
 
         /// <summary>
         /// Reserve a link for file upload.
         /// </summary>
+        /// <param name="filepath">Link to make token for</param>
         /// <returns>Token and link</returns>
-        public static Token getToken()
+        public static Token getToken(string filepath)
         {
-            var request = WebRequest.Create(HOST + "/upload-token");
-            string text;
-            var response = (HttpWebResponse)request.GetResponse();
-            using (var sr = new StreamReader(response.GetResponseStream()))
+            string filename = Path.GetFileName(filepath);
+            string mime = GetContentType(filepath);
+
+            NameValueCollection values = new NameValueCollection();
+            values.Add("filename", filename);
+            values.Add("mime", mime);
+
+            using (WebClient client = new WebClient())
             {
-                text = sr.ReadToEnd();
+                client.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                byte[] result = client.UploadValues(HOST + "/upload-token/", "POST", values);
+                string text = Encoding.UTF8.GetString(result);
+                Token json = JsonConvert.DeserializeObject<Token>(text);
+                return json;
             }
-            Token json = JsonConvert.DeserializeObject<Token>(text);
-            return json;
         }
 
         /// <summary>
         /// Attempts to query registry for content-type of supplied file name.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
-        public static bool TryGetContentType(string fileName, out string contentType)
+        /// <param name="fileName">File to analyze</param>
+        /// <returns>mime-type, application/octet-stream if it fails in finding it.</returns>
+        public static string GetContentType(string fileName)
         {
             try
             {
@@ -107,8 +123,7 @@ namespace Windows_qPaste
                                                     subKeyValue.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase) ==
                                     0)
                                 {
-                                    contentType = keyName;
-                                    return true;
+                                    return keyName;
                                 }
                             }
                         }
@@ -122,8 +137,7 @@ namespace Windows_qPaste
                 // TODO: rethrow registry access denied errors
             }
             // ReSharper restore EmptyGeneralCatchClause
-            contentType = "";
-            return false;
+            return "application/octet-stream";
         }
     }
 }
