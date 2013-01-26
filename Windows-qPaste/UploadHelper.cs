@@ -65,12 +65,29 @@ namespace Windows_qPaste
             try
             {
                 string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
+                UploadDone(token.token);
             }
             catch (System.Net.WebException ex)
             {
                 string output = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
                 Console.WriteLine(output);
                 Debug.WriteLine(output);
+            }
+        }
+
+        /// <summary>
+        /// Callback to main server after upload to S3 is done.
+        /// </summary>
+        /// <param name="token">Token for the file that was just uploaded</param>
+        private static void UploadDone(string token)
+        {
+            NameValueCollection values = new NameValueCollection();
+            values.Add("token", token);
+
+            using (WebClient client = new WebClient())
+            {
+                client.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                byte[] result = client.UploadValues(HOST + "/upload-done", "POST", values);
             }
         }
 
