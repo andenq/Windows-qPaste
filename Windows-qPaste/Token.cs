@@ -91,6 +91,12 @@ namespace Windows_qPaste
                 get;
                 set;
             }
+
+            public string disposition
+            {
+                get;
+                set;
+            }
         }
     }
 }

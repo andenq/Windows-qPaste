@@ -60,6 +60,7 @@ namespace Windows_qPaste
             form["Bucket"] = token.storage.s3Policy.conditions.bucket;
             form["acl"] = token.storage.s3Policy.conditions.acl;
             form["Content-Type"] = token.storage.s3Policy.conditions.mime;
+            form["Content-Disposition"] = token.storage.s3Policy.conditions.disposition;
 
             try
             {
@@ -90,7 +91,7 @@ namespace Windows_qPaste
             using (WebClient client = new WebClient())
             {
                 client.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                byte[] result = client.UploadValues(HOST + "/upload-token/", "POST", values);
+                byte[] result = client.UploadValues(HOST + "/upload-token", "POST", values);
                 string text = Encoding.UTF8.GetString(result);
                 Token json = JsonConvert.DeserializeObject<Token>(text);
                 return json;
