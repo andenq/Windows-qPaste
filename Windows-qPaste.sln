@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows-qPaste", "Windows-qPaste\Windows-qPaste.csproj", "{5624EB8F-2F14-4815-8A17-C03D1AD872CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadHelper", "UploadHelper\UploadHelper.csproj", "{02FBD52C-B997-4D18-9E2C-81B5AE8EFB30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{5624EB8F-2F14-4815-8A17-C03D1AD872CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5624EB8F-2F14-4815-8A17-C03D1AD872CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5624EB8F-2F14-4815-8A17-C03D1AD872CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02FBD52C-B997-4D18-9E2C-81B5AE8EFB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02FBD52C-B997-4D18-9E2C-81B5AE8EFB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02FBD52C-B997-4D18-9E2C-81B5AE8EFB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02FBD52C-B997-4D18-9E2C-81B5AE8EFB30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,7 +31,7 @@
     <SuiteName>qPaste %28Quick Paste%29</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -81,10 +81,6 @@
     <Reference Include="Ionic.Utils.Zip, Version=1.5.2.1, Culture=neutral, PublicKeyToken=c551e179877da246, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Ionic.Utils.Zip.dll</HintPath>
-    </Reference>
-    <Reference Include="Krystalware.UploadHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Krystalware.UploadHelper.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -156,7 +152,6 @@
     <None Include="Libraries\Newtonsoft.Json.dll" />
     <None Include="ajax-loader.gif" />
     <None Include="Libraries\InputSimulator.dll" />
-    <None Include="Libraries\Krystalware.UploadHelper.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -169,6 +164,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UploadHelper\UploadHelper.csproj">
+      <Project>{02fbd52c-b997-4d18-9e2c-81b5ae8efb30}</Project>
+      <Name>UploadHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
