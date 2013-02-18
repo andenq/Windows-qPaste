@@ -16,8 +16,9 @@ namespace Windows_qPaste
     class UploadHelper
     {
         //public static readonly string HOST = "http://127.0.0.1:1337";
-        public static readonly string HOST = "http://qpaste.rs.af.cm";
+        //public static readonly string HOST = "http://qpaste.rs.af.cm";
         //public static readonly string HOST = "http://qpaste-dev.rs.af.cm";
+        public static readonly string HOST = "http://qpaste.it";
 
         /// <summary>
         /// Upload file to server.
@@ -66,12 +67,14 @@ namespace Windows_qPaste
             {
                 string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
                 UploadDone(token.token);
+                /*Krystalware.UploadHelper.AsyncHttpUploadHelper.Upload(url, files, form, new AsyncCallback((IAsyncResult result) => {
+                    UploadDone(token.token);
+                }));*/
             }
             catch (System.Net.WebException ex)
             {
                 string output = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
-                Console.WriteLine(output);
-                Debug.WriteLine(output);
+                Console.WriteLine("Exception, suck it");
             }
         }
 

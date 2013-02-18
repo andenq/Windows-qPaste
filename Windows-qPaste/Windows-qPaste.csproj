@@ -23,15 +23,15 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://qpaste.andreascoroiu.com/download/</InstallUrl>
-    <SupportUrl>http://qpaste.andreascoroiu.com</SupportUrl>
-    <ErrorReportUrl>http://qpaste.andreascoroiu.com</ErrorReportUrl>
+    <InstallUrl>http://download.qpaste.it/clients/windows/</InstallUrl>
+    <SupportUrl>http://qpaste.it</SupportUrl>
+    <ErrorReportUrl>http://qpaste.it</ErrorReportUrl>
     <ProductName>qPaste for Windows</ProductName>
     <PublisherName>Andreas Coroiu</PublisherName>
     <SuiteName>qPaste %28Quick Paste%29</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
