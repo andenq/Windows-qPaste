@@ -35,7 +35,6 @@ namespace Windows_qPaste
             }));
             notifyIcon.Text += " - " + Program.ProductVersion;
             notifyIcon.ContextMenu = new ContextMenu(items);
-            
         }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)

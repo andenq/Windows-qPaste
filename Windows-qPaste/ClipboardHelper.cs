@@ -75,6 +75,7 @@ namespace Windows_qPaste
             {
                 Paste(link);
             }
+            ToastForm.DontView();
         }
 
         /// <summary>

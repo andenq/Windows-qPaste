@@ -12,11 +12,9 @@ using System.Windows.Forms;
 
 namespace Windows_qPaste
 {
-    public partial class ToastForm : Form
+    public partial class ToastForm : TopForm
     {
         private const int SW_SHOWNA = 8;
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        private extern static int ShowWindow(IntPtr hWnd, int nCmdShow);
 
         public ToastForm()
         {
@@ -25,10 +23,6 @@ namespace Windows_qPaste
         }
 
         private static ToastForm instance;
-        protected override bool ShowWithoutActivation
-        {
-            get { return true; }
-        }
 
         public static void View()
         {

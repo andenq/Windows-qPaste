@@ -18,19 +18,28 @@ namespace Krystalware.UploadHelper
         private HttpUploadHelper()
         { }
 
-        public static string Upload(string url, UploadFile[] files, NameValueCollection form)
+        public static string Upload(string url, UploadFile[] files, NameValueCollection form, Action<int> progress)
         {
-            HttpWebResponse resp = Upload((HttpWebRequest)WebRequest.Create(url), files, form);
-
-            using (Stream s = resp.GetResponseStream())
-            using (StreamReader sr = new StreamReader(s))
+            try
             {
-                return sr.ReadToEnd();
+                HttpWebResponse resp = Upload((HttpWebRequest)WebRequest.Create(url), files, form, progress);
+
+                using (Stream s = resp.GetResponseStream())
+                using (StreamReader sr = new StreamReader(s))
+                {
+                    return sr.ReadToEnd();
+                }
+            } catch {
+                throw;
             }
         }
 
-        public static HttpWebResponse Upload(HttpWebRequest req, UploadFile[] files, NameValueCollection form)
+        public static HttpWebResponse Upload(HttpWebRequest req, UploadFile[] files, NameValueCollection form, Action<int> progress)
         {
+            req.Timeout = int.MaxValue; //Maximum timeout
+            req.ReadWriteTimeout = int.MaxValue;
+            req.AllowWriteStreamBuffering = false;
+
             List<MimePart> mimeParts = new List<MimePart>();
 
             try
@@ -82,6 +91,7 @@ namespace Krystalware.UploadHelper
                 byte[] afterFile = Encoding.UTF8.GetBytes("\r\n");
                 int read;
 
+                decimal sent = 0;
                 using (Stream s = req.GetRequestStream())
                 {
                     foreach (MimePart part in mimeParts)
@@ -89,7 +99,13 @@ namespace Krystalware.UploadHelper
                         s.Write(part.Header, 0, part.Header.Length);
 
                         while ((read = part.Data.Read(buffer, 0, buffer.Length)) > 0)
+                        {
                             s.Write(buffer, 0, read);
+                            sent += buffer.Length;
+                            progress((int) Math.Round((sent / req.ContentLength) * 100));
+                            //TODO Something here is causing miscalculation in total data to be sent!
+                            //Console.WriteLine("MB sent: " + Math.Round(sent / (1024 * 1024) , 2) + " - Percent: " + Math.Round((sent / req.ContentLength) * 100, 2) + "%");
+                        }
 
                         part.Data.Dispose();
 
@@ -100,7 +116,6 @@ namespace Krystalware.UploadHelper
                 }
                 
                 req.KeepAlive = false; //Request gets canceled otherwise
-                req.Timeout = int.MaxValue; //Maximum timeout
                 return (HttpWebResponse)req.GetResponse();
             }
             catch 

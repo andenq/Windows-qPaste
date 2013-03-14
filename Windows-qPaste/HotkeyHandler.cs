@@ -151,7 +151,7 @@ namespace Windows_qPaste
                 {
                     UploadText((string)content);
                 }
-                ToastForm.DontView();
+                
             }
         }
 

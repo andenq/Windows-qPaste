@@ -1,4 +1,6 @@
-﻿using Krystalware.UploadHelper;
+﻿using Amazon.S3;
+using Amazon.S3.Model;
+using Krystalware.UploadHelper;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Windows_qPaste
 {
@@ -48,34 +51,51 @@ namespace Windows_qPaste
         {
             //Library from http://aspnetupload.com/Upload-File-POST-HttpWebRequest-WebClient-RFC-1867.aspx
             //string url = HOST + "/upload";
-            string url = "http://qpaste.s3.amazonaws.com/";
-            UploadFile[] files = new UploadFile[] 
-            { 
-                new UploadFile(filepath, "file", token.storage.s3Policy.conditions.mime)
-            };
-            NameValueCollection form = new NameValueCollection();
-            form["key"] = token.storage.s3Policy.conditions.key;
-            form["AWSAccessKeyId"] = token.storage.s3Key;
-            form["Policy"] = token.storage.s3PolicyBase64;
-            form["Signature"] = token.storage.s3Signature;
-            form["Bucket"] = token.storage.s3Policy.conditions.bucket;
-            form["acl"] = token.storage.s3Policy.conditions.acl;
-            form["Content-Type"] = token.storage.s3Policy.conditions.mime;
-            form["Content-Disposition"] = token.storage.s3Policy.conditions.disposition;
+            //ProgressForm.Instance.BeginInvoke(new Action(() => { ProgressForm.Instance.Show(); }), null);
 
-            try
+            ProgressForm.Show();
+
+            bool tryagain = false;
+            do
             {
-                string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form);
-                UploadDone(token.token);
-                /*Krystalware.UploadHelper.AsyncHttpUploadHelper.Upload(url, files, form, new AsyncCallback((IAsyncResult result) => {
+                try
+                {
+                    string url = "http://qpaste.s3.amazonaws.com/";
+                    UploadFile[] files = new UploadFile[] 
+                    { 
+                        new UploadFile(filepath, "file", token.storage.s3Policy.conditions.mime)
+                    };
+                    NameValueCollection form = new NameValueCollection();
+                    form["key"] = token.storage.s3Policy.conditions.key;
+                    form["AWSAccessKeyId"] = token.storage.s3Key;
+                    form["Policy"] = token.storage.s3PolicyBase64;
+                    form["Signature"] = token.storage.s3Signature;
+                    form["Bucket"] = token.storage.s3Policy.conditions.bucket;
+                    form["acl"] = token.storage.s3Policy.conditions.acl;
+                    form["Content-Type"] = token.storage.s3Policy.conditions.mime;
+                    form["Content-Disposition"] = token.storage.s3Policy.conditions.disposition;
+
+                    string response = Krystalware.UploadHelper.HttpUploadHelper.Upload(url, files, form, new Action<int>((int progress) => {
+                        ProgressForm.Value = progress;
+                    }));
                     UploadDone(token.token);
-                }));*/
-            }
-            catch (System.Net.WebException ex)
-            {
-                string output = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
-                Console.WriteLine("Exception, suck it");
-            }
+
+                    tryagain = false;
+                }
+                catch
+                {
+                    //string output = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                    //Console.WriteLine("Exception, suck it");
+                    DialogResult result = MessageBox.Show("An error occurred when qPaste was uploading your file!\nDo you want to try again?",
+                        "Upload error",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Error);
+
+                    tryagain = result.Equals(DialogResult.Yes);
+                }
+            } while (tryagain);
+
+            ProgressForm.Hide();
         }
 
         /// <summary>
